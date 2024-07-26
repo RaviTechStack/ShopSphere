@@ -39,3 +39,20 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment_content[0:15] + "..."
+    
+
+class Order(models.Model):
+    status_choice = [
+        ("PENDING", "Pending"),
+        ("DISPATCHED", "Dispatched"),
+        ("COMPLETED", "Completed"),
+        ("CANCELLED", "Cancelled"),
+    ]
+    order_id = models.AutoField(primary_key=True, unique=True, null=False)
+    order_status = models.CharField(choices=status_choice, max_length=10, default="PENDING")
+    orderUser = models.ForeignKey(User, on_delete=models.CASCADE)
+    order_prod = models.ForeignKey(Allproducts, on_delete=models.CASCADE)
+    prod_quantity = models.IntegerField(default=1, null=False)
+    prod_color = models.CharField(max_length=50, null=False)
+    prod_size = models.CharField(max_length=3, null=False)
+    order_amount = models.IntegerField(default=1)

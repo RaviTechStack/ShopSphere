@@ -97,3 +97,32 @@ addCartBtn.addEventListener("click", ()=>{
     localStorage.setItem("wcart", JSON.stringify(cart))
     console.log(cart)
 })
+
+// PUT DATA INTO DATABASE LIKE SIZE AND COLOR FOR WHICH INPUT TAG IS NOT THERE SO USING JS TO ASSING THE DATA ON CLICK ON ANY OPTION 
+document.addEventListener("DOMContentLoaded", ()=>{
+    let selectedColor = null
+    let selectedSize = null
+
+    document.querySelectorAll(".col").forEach((col)=>{
+        col.addEventListener("click", ()=>{
+            selectedColor = col.getAttribute("data-colr")
+            document.querySelector("#inputColor").value = selectedColor
+        })
+    })
+    document.querySelectorAll(".si").forEach((size)=>{
+        size.addEventListener("click", ()=>{
+            selectedSize = size.innerText
+            document.querySelector("#inputSize").value = selectedSize
+        })
+    })
+
+    document.querySelector("#orderForm").addEventListener("submit", (e)=>{
+        let color = document.querySelector("#inputColor").value
+        let size = document.querySelector("#inputSize").value
+
+        if(!color || !size){
+            e.preventDefault()
+            alert("color and size should be selected")
+        }
+    })
+})

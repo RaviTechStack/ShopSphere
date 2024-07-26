@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from .models import Allproducts, profile, Comment
+from .models import Allproducts, profile, Comment, Order
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 
@@ -76,6 +76,22 @@ def detailpage(request, slug):
         "all" : related_products
     }
     return render(request, "productpage.html", params)
+
+#Order Suucess page after successfuly order of any products
+def showOrderPage(request):
+    if request.method == "POST":
+        prod = request.POST.get("product")
+        prodColor = request.POST.get("color")
+        prodSize = request.POST.get("size")
+        prodPrice = request.POST.get("price")
+        prdQuantity = request.POST.get("prod_quantity")
+
+        instanceProd = Allproducts.objects.get(prod_id = prod)
+        
+        newOrder = Order(orderUser= request.user, order_prod=instanceProd, prod_quantity =prdQuantity, prod_color=prodColor, prod_size= prodSize, order_amount = int(prodPrice)*int(prdQuantity) )
+        newOrder.save()
+        return redirect("/order")
+    return render(request, "orderSuccess.html")
 
 def showCart(request):
     return render(request, "cart.html")

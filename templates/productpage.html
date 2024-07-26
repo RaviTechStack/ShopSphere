@@ -5,65 +5,73 @@
 <link rel="stylesheet" href="{% static 'style.css' %}?{% now 'U' %}">
 {% endblock %}
 {% block body %}
-<main class="grid">
-    <div class="image-part flex-col">
-        <div class="main-img center">
-            <img src="./media/{{detail.prod_image}}" alt="" class="imgpr{{detail.prod_id}}">
+<form action="order" method="post" id="orderForm">
+    {% csrf_token %}
+    <input type="hidden" name="product" value="{{detail.prod_id}}">
+    <input type="hidden" name="color" id="inputColor">
+    <input type="hidden" name="size" id="inputSize">
+    <input type="hidden" name="price" value="{{detail.prod_price}}">
+    <main class="grid">
+        <div class="image-part flex-col">
+            <div class="main-img center">
+                <img src="./media/{{detail.prod_image}}" alt="" class="imgpr{{detail.prod_id}}">
 
-        </div>
-    </div>
-    <div class="desc-part flex-col">
-        <div class="header-container flex-col">
-
-            <h2>{{detail.prod_name}}</h2>
-            <div class="star">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-
-        </div>
-        <div class="price part flex">
-            <h4>Price</h4>
-            <div class="price-contain">
-                <h2 class="pricepr{{detail.prod_id}}">₹{{detail.prod_price}}</h2>
             </div>
         </div>
-        <div class="detail-desc flex-col">
+        <div class="desc-part flex-col">
+            <div class="header-container flex-col">
 
+                <h2>{{detail.prod_name}}</h2>
+                <div class="star">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
 
-            <div class="quantity part flex">
-                <h4>quantity</h4>
-                <div class="buttons flex"><button id="minus">-</button>
-                    <form action="/" method="post">
-                        <input type="text" value="1" id="quantity">
-                    </form><button id="plus">+</button>
+            </div>
+            <div class="price part flex">
+                <h4>Price</h4>
+                <div class="price-contain">
+                    <h2 class="pricepr{{detail.prod_id}}">₹{{detail.prod_price}}</h2>
                 </div>
             </div>
-            <div class="colors part flex">
-                <h4>color</h4>
-                <div class="color-list flex">
-                    <span class="col"></span>
-                    <span class="col"></span>
-                    <span class="col"></span>
-                </div>
-            </div>
-            <div class="size flex part">
-                <h4>Size</h4>
-                <div class="size-list flex">
-                    <span class="si">S</span><span class="si">M</span><span class="si">L</span><span
-                        class="si">XL</span><span class="si">XXL</span>
-                </div>
-            </div>
-            <div class="detail part flex-col">
-                <h4>Product Detail</h4>
-                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non id distinctio, culpa assumenda
-                    illum animi
-                    explicabo debitis, modi nostrum ducimus quidem temporibus. Consectetur, natus cum.</p>
-            </div>
-        </div>
+            <div class="detail-desc flex-col">
 
-        <div class="action-btn flex">
-            <button class="ProdCartBtn" id="pr{{detail.prod_id}}">Add to Cart</button><button>quick Buy</button>
+
+                <div class="quantity part flex">
+                    <h4>quantity</h4>
+                    <div class="buttons flex"><button id="minus">-</button>
+                        
+                            <input type="text" value="1" name="prod_quantity" id="quantity">
+                        <button id="plus">+</button>
+                    </div>
+                </div>
+                <div class="colors part flex">
+                    <h4>color</h4>
+                    <div class="color-list flex">
+                        <span class="col" data-colr="red"></span>
+                        <span class="col" data-colr="green"></span>
+                        <span class="col" data-colr="blue"></span>
+                    </div>
+                </div>
+                <div class="size flex part">
+                    <h4>Size</h4>
+                    <div class="size-list flex">
+                        <span class="si">S</span><span class="si">M</span><span class="si">L</span><span
+                            class="si">XL</span><span class="si">XXL</span>
+                    </div>
+                </div>
+                <div class="detail part flex-col">
+                    <h4>Product Detail</h4>
+                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non id distinctio, culpa assumenda
+                        illum animi
+                        explicabo debitis, modi nostrum ducimus quidem temporibus. Consectetur, natus cum.</p>
+                </div>
+            </div>
+
+            <div class="action-btn flex">
+                <button class="ProdCartBtn" id="pr{{detail.prod_id}}">Add to Cart</button>
+                <button type="submit">quick Buy</button>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+</form>
 
 
 <section class="rel-heading flex">
@@ -141,6 +149,12 @@
     </div>
 </section>
 </body>
+
+
+
+<script>
+    const price = "{{prod.prod_price}}"
+</script>
 <script src="{% static '/product.js' %}?{% now 'U' %}"></script>
 
 {% endblock %}

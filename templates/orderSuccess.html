@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'style.css' %}?{% now 'U' %}">
+{% endblock %}
+{% block body %}
+<h1>Order Success</h1>
+{% endblock %}
