@@ -1,7 +1,12 @@
 from django.shortcuts import render, HttpResponse, redirect
 from .models import Allproducts, profile, Comment, Order
 from django.contrib.auth.models import User
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
@@ -27,6 +32,11 @@ def index(request):
         "new" : new_arrival,
         "trending" : trending
     }
+    # subject = 'welcome to R fashion'
+    # message = f'Hi thank you for choosing us.'
+    # email_from = settings.EMAIL_HOST_USER
+    # recipient_list = ["ravisinghd98@gmail.com", ]
+    # send_mail( subject, message, email_from, recipient_list )
     
     return render(request, "index.html" , parameters)
 
@@ -77,6 +87,10 @@ def detailpage(request, slug):
     }
     return render(request, "productpage.html", params)
 
+#Creating A Client For Payment
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+
+
 #Order Suucess page after successfuly order of any products
 def showOrderPage(request):
     if request.method == "POST":
@@ -87,11 +101,57 @@ def showOrderPage(request):
         prdQuantity = request.POST.get("prod_quantity")
 
         instanceProd = Allproducts.objects.get(prod_id = prod)
+        order_amount = int(prodPrice) * 100
+        order_currency = "INR"
+        order_recipt  = "order_rcptid_11"
+
+        razorpay_order = razorpay_client.order.create(dict(
+            amount = order_amount,
+            currency = order_currency,
+            receipt = order_recipt,
+            payment_capture = 1,
+        ))
+
+        order_id = razorpay_order["id"]
+        context = {
+            "product" : instanceProd,
+            "order_id" : order_id,
+            "amount" : order_amount,
+            "currency" : order_currency,
+            "api_key" : settings.RAZORPAY_API_KEY,
+        }
         
-        newOrder = Order(orderUser= request.user, order_prod=instanceProd, prod_quantity =prdQuantity, prod_color=prodColor, prod_size= prodSize, order_amount = int(prodPrice)*int(prdQuantity) )
-        newOrder.save()
-        return redirect("/order")
-    return render(request, "orderSuccess.html")
+        return render(request, "orderSuccess.html", context)
+    return render(request, "index.html")
+
+
+#checking Payment Succsess
+@csrf_exempt
+def payment_success(request):
+    if request.method == "POST":
+        try:
+            payment_id = request.POST.get("razorpay_payment_id", "")
+            order_id = request.POST.get("razorpay_order_id", "")
+            signature = request.POST.get("razorpay_signature", "")
+
+            context={
+               "razorpay_order_id" : order_id,
+               "razorpay_payment_id" : payment_id,
+               "razorpay_signature" : signature
+            }
+            result = razorpay_client.utility.verify_payment_signature(context)
+
+            if result:
+                return render(request, "paymentSuccess.html")
+            else:
+                return render(request, "paymentFailed.html")
+        except:
+                return render(request, "paymentFailed.html")
+    else:
+        return render(request, "paymentFailed.html")
+
+
+
 
 def showCart(request):
     return render(request, "cart.html")
@@ -142,7 +202,7 @@ def signup(request):
         add2 = request.POST.get("add2")
         pincode = request.POST.get("pincode")
 
-        user = User.objects.create_user(email, password)
+        user = User.objects.create_user(email, email, password)
         user.first_name = fname
         user.last_name = lname
         user.save()
@@ -152,5 +212,6 @@ def signup(request):
         return redirect("/signin")
     return render(request, "signup.html")
 
-def logout(request):
-    return logout(request)
+def logout_user(request):
+    logout(request)
+    return redirect("/")

@@ -21,8 +21,11 @@
                 <li id="categories">Categories</li>
             </ul>
             <ul class="flex">
+                {% if user.is_authenticated %}
+                <a href="logout"><li>Welcome {{user.firstname}}</li></a>
+                {% else %}
                 <a href="signin"><li>signIn</li></a>
-                <li>Contact</li>
+                {% endif %}
             </ul>
         </div>
         <div class="bottom-nav flex">
