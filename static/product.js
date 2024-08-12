@@ -84,6 +84,7 @@ else{
 let addCartBtn = document.querySelector(".ProdCartBtn")
 
 addCartBtn.addEventListener("click", ()=>{
+    addCartBtn.innerText ="Added to cart"
     var idstr = addCartBtn.id
     if(cart[idstr]== undefined){
         var qty = 1

@@ -72,11 +72,14 @@ def detailpage(request, slug):
     related_products = Allproducts.objects.filter(prod_category = detail_prod.prod_category).exclude(prod_id = detail_prod.prod_id)
 
     if request.method == "POST":
-        comment_contents = request.POST.get("feedback")
-        rating = request.POST.get("rating-no")
-        comment = Comment(prod_rating = rating, comment_post = detail_prod, comment_content = comment_contents, comment_user = request.user, )
-        comment.save()
-        return redirect(f"/detailpro/{detail_prod.prod_slug}")
+        if request.user.is_authenticated:
+            comment_contents = request.POST.get("feedback")
+            rating = request.POST.get("rating-no")
+            comment = Comment(prod_rating = rating, comment_post = detail_prod, comment_content = comment_contents, comment_user = request.user, )
+            comment.save()
+            return redirect(f"/detailpro/{detail_prod.prod_slug}")
+        else:
+            return redirect("/signin")
     
     comnt_detail= Comment.objects.filter(comment_post = detail_prod)
 
@@ -117,6 +120,7 @@ def showOrderPage(request):
             "product" : instanceProd,
             "order_id" : order_id,
             "amount" : order_amount,
+            "display_amount" : prodPrice,
             "currency" : order_currency,
             "api_key" : settings.RAZORPAY_API_KEY,
         }
